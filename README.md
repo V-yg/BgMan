@@ -28,7 +28,7 @@ Spring Boot 2.x+Layui+Mybatis+MySQL+Shiro+Redis+JWT+Swagger2+thymeleaf+druid
 
 前端模板		 ![https://img.shields.io/badge/Layui-2.1.0-5ba5e1 ](https://img.shields.io/badge/Layui-2.1.0-5ba5e1)
 
-#### 体验地址：
+#### 体验地址： http://14.116.203.21:8082/
 
 **体验账号**
 
