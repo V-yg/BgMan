@@ -1,0 +1,66 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: pgman
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://14.116.203.21:3306/bgman?useUnicode=true&characterEncoding=utf-8&useSSL=false
+      username: root
+      password: WYG666sdx
+      initial-size: 5
+      max-active: 20
+      min-idle: 5
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      validation-query: SELECT 1 FROM DUAL
+      validation-query-timeout: 30000
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      filters: stat,wall
+  redis:
+    host: 14.116.203.21
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 100
+        max-wait: PT10s
+        max-idle: 30
+        min-idle: 1
+    timeout: PT10S
+  devtools:
+    restart:
+      poll-interval: 3000ms
+      quiet-period: 2999ms
+  thymeleaf:
+    suffix: .html
+    servlet:
+      content-type: text/html
+    cache: false
+    charset: UTF-8
+#  mvc:
+#    static-path-pattern: /static/**
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+logging:
+  file: ${logging.path}/${spring.application.name}.log
+  path: logs
+  level:
+    root: info
+swagger2:
+  enable: true
+jwt:
+  secretKey: 78944878877848fg)
+  accessTokenExpireTime: PT2H
+  refreshTokenExpireTime: PT8H
+  refreshTokenExpireAppTime: P30D
+  issuer: yiie.com
+
+
+
