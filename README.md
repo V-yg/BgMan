@@ -58,6 +58,7 @@ Spring Boot 2.x+Layui+Mybatis+MySQL+Shiro+Redis+JWT+Swagger2+thymeleaf+druid
 ```
 
 #### 系统截图：
+![https://github.com/V-yg/BgMan/blob/master/images/1.png ](https://github.com/V-yg/BgMan/blob/master/images/1.png)
 
 
 
