@@ -7,9 +7,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://14.116.203.21:3306/bgman?useUnicode=true&characterEncoding=utf-8&useSSL=false
-      username: root
-      password: WYG666sdx
+      url: jdbc:mysql://xx.xx.xx.xx:3306/bgman?useUnicode=true&characterEncoding=utf-8&useSSL=false
+      username: 
+      password: 
       initial-size: 5
       max-active: 20
       min-idle: 5
@@ -25,8 +25,8 @@ spring:
       min-evictable-idle-time-millis: 300000
       filters: stat,wall
   redis:
-    host: 14.116.203.21
-    port: 6379
+    host: 
+    port: 
     lettuce:
       pool:
         max-active: 100
