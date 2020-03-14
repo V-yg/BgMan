@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiie.common.mapper.VPNUserMapper">
+    <resultMap id="BaseResultMap" type="com.yiie.entity.VPNUser">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="level" jdbcType="VARCHAR" property="level"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="deleted" jdbcType="TINYINT" property="deleted"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin"/>
+        <result column="expiration_time" jdbcType="TIMESTAMP" property="expirationTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, username, email,`status`,level, deleted,create_time, last_login,expiration_time
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.yiie.vo.request.VPNUserPageReqVO">
+        select
+        <include refid="Base_Column_List"></include>
+        from vpn_user
+        <where>
+            deleted=1
+            <if test="username!=null and username!=''">
+                AND username LIKE concat('%',#{username},'%')
+            </if>
+            <if test="level!=null and level!=''">
+                AND level =#{level}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                AND create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                AND create_time &lt;= #{endTime}
+            </if>
+            <if test="userId!=null and userId!='' ">
+                AND id=#{userId}
+            </if>
+            <if test="status!=null and status!='' or status==0 ">
+                AND `status`=#{status}
+            </if>
+        </where>
+        order by create_time DESC
+    </select>
+
+    <update id="deletedUsers">
+        update vpn_user
+        <set>
+            deleted = 0,
+        </set>
+        where id in
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <insert id="insertSelective" parameterType="com.yiie.entity.VPNUser">
+        insert into vpn_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="username != null">
+                username,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="expirationTime != null">
+            expiration_time,
+            </if>
+            <if test="lastLogin != null">
+                last_login,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="username != null">
+                #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="level != null">
+                #{level,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="expirationTime != null">
+                #{expirationTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastLogin != null">
+                #{lastLogin,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from vpn_user
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.yiie.entity.VPNUser">
+        update vpn_user
+        <set>
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="level != null">
+                level = #{level,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                `status` = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=TINYINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

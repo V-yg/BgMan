@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/css/form.css">
+    <script src="/layui/layui.all.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.6.0/echarts.min.js"></script>
+    <link rel="stylesheet" href="/css/febs.css">
+</head>
+<body>
+<div class="panel panel-default operation_user" hidden>
+    <div class="panel-heading title" style="text-align: center"></div>
+    <div class="layui-card-body" >
+        <form class="layui-form " action="" lay-filter="deptInfo" style="float:left;margin-top: 30px;margin-left:50px;width: 500px">
+            <input name="id" hidden/>
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="username" placeholder="用户名" autocomplete="off" class="layui-input" readonly="true" >
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">信用分</div>
+                <div class="layui-input-block">
+                    <input type="text"  lay-verify="number" name="credit" placeholder="请输入信用分" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div >
+                <div class="layui-form-label ">最大上传</div>
+                <div id = "slideUp" style="position:relative; left: 120px; top: 18px;max-width: 370px"></div>
+                <input type="text" name = "maxUp" hidden>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">最大下载</div>
+                <div id = "slideDown" style="position:relative; left: 120px; top: 18px;max-width: 370px"></div>
+                <input name = "maxDown" hidden>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">剩余流量</div>
+                <div class="layui-input-block">
+                    <input type="text" lay-verify="number"  name="flow" placeholder="请输入流量" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">余额</div>
+                <div class="layui-input-block">
+                    <input type="text" lay-verify="number" name="money" placeholder="请输入余额" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+                    <button class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+                </div>
+            </div>
+        </form>
+        <div id="echars1" style="float:right; width: 600px;height: 500px;margin-top: 30px;margin-right: 50px;"></div>
+    </div>
+</div>
+<div class="user_table_div">
+    <div style="float:left;width: 800px">
+        <div id="searchParam" shiro:hasPermission="sys:vpnuserflow:list">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input type="text" id="username" class="layui-input" autocomplete="off" placeholder="请输入用户名">
+                </div>
+                <div class="layui-input-inline layui-form ">
+                    <select class="" id="credit">
+                        <option value="">请选择信用等级</option>
+                        <option value="1">优秀</option>
+                        <option value="2">良好</option>
+                        <option value="3">一般</option>
+                        <option value="4">不良</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <table class="layui-hide" id="user_table" lay-filter="user_table"></table>
+        <div id="laypage" class= "$(" .layui-laypage-btn").click();"></div>
+    </div>
+    <div style="float:right;margin: 0 auto;width: 450px; height:590px;" >
+        <canvas id="c" style="margin-top: 100px;margin-left: 80px;">当前浏览器不支持canvas 请升级！</canvas>
+        <div style="margin-top: 30px;">
+            <span style="font-size: 20px;margin-left: 20px;">流量总额: </span><a style="margin-left:5px;text-decoration:underline;color: #82e516;font-size: 20px;">588.9 GB</a>
+            <span style="font-size: 20px;margin-left: 20px;">剩余总额: </span><a style="margin-left:5px;text-decoration:underline;color: red;font-size: 20px;">403.4 GB</a>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/html" id="toolbar">
+    <div class="layui-btn-group" id="search">
+        <button type="button" class="layui-btn" lay-event="search" >
+            <i class="layui-icon">&#xe615;</i> 开始检索
+        </button>
+    </div>
+</script>
+<script type="text/html" id="creditTpl">
+    <div>
+        {{# if (d.credit >= 90) { }}
+        <span class="layui-badge febs-tag-green">{{d.credit}} 优秀</span>
+        {{# } else if (d.credit >= 80 && d.credit < 90) { }}
+        <span class="layui-badge febs-tag-cyan">{{d.credit}} 良好</span>
+        {{# } else if (d.credit >= 60 && d.credit < 80) { }}
+        <span class="layui-badge febs-tag-orange">{{d.credit}} 一般</span>
+        {{# } else if (d.credit < 60) { }}
+        <span class="layui-badge febs-tag-red">{{d.credit}} 不良</span>
+        {{# } else { }}
+        <span>无记录</span>
+        {{# } }}
+    </div>
+</script>
+<script type="text/html" id="upTpl">
+    <div>
+        <span class="layui-badge febs-bg-flowcolor">{{d.maxUp}} M/s</span>
+    </div>
+</script>
+<script type="text/html" id="downTpl">
+    <div>
+        <span class="layui-badge febs-bg-flowcolor">{{d.maxDown}} M/s</span>
+    </div>
+</script>
+<script type="text/html" id="flowTpl">
+    <div>
+        <span class="layui-badge febs-bg-flowcolor1">{{d.flow}} MB</span>
+    </div>
+</script>
+<script type="text/html" id="tool">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="limit" shiro:hasPermission="sys:vpnuserflow:limit">限速</a>
+    <a class="layui-btn  layui-btn-xs" lay-event="edit" shiro:hasPermission="sys:vpnuserflow:update">编辑</a>
+</script>
+<script>
+    var table = layui.table;
+    var laypage = layui.laypage
+    var form = layui.form;
+    var layer = layui.layer;
+    var $ = jQuery = layui.jquery;
+    var laydate = layui.laydate;
+    var tree = layui.tree;
+    var slider = layui.slider;
+    var transfer = layui.transfer;
+    layui.use(['table', 'laypage', 'layer', 'laydate', 'tree', 'transfer','slider'], function () {
+        form.render();
+        var searchParam = {
+            userId: null,
+            username: null,
+            credit: null,
+            pageNum: 1,
+            pageSize: 10
+        }
+
+        CoreUtil.sendAjax("/sys/vpnuserflows", JSON.stringify(searchParam), function (res) {
+            laypageTable(res.data.totalRows, searchParam.pageNum);
+            if (res.data.list != null) {
+                loadTable(res.data.list);
+            }
+        }, "POST", false, function (res) {
+            layer.msg("抱歉！您暂无获取用户流量列表的权限");
+            var noAuthorityData = [];
+            loadTable(noAuthorityData);
+        });
+        var laypageTable = function (count, currentPage) {
+            laypage.render({
+                elem: 'laypage'
+                , count: count
+                , limit: searchParam.pageSize
+                , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                , curr: location.hash.replace('#!currentPage=', '') //获取起始页
+                , hash: 'currentPage' //自定义hash值
+                , jump: function (obj, first) {
+                    if (!first) {
+                        searchParam.pageNum = obj.curr;
+                        searchParam.pageSize = obj.limit;
+                        CoreUtil.sendAjax("/sys/vpnuserflows", JSON.stringify(searchParam), function (res) {
+                            if (res.data.list != null) {
+                                loadTable(res.data.list);
+                                laypageTable(res.data.totalRows, searchParam.pageNum);
+                            }
+                        }, "POST", false, function (res) {
+                            layer.msg("抱歉！您暂无获取用户流量列表的权限");
+                            var noAuthorityData = [];
+                            loadTable(noAuthorityData);
+                        });
+                    }
+                }
+            });
+        };
+        //渲染table
+        var loadTable = function (data) {
+            table.render({
+                elem: '#user_table'
+                , cols: [
+                    [
+                        {field: 'username', align: 'center', title: '用户名'},
+                        {field: 'credit', align: 'center', title: '信用等级', templet:'#creditTpl'},
+                        {field: 'connect', align: 'center', title: '状态', templet:function(value){
+                            if(value.connect == 1){
+                                return '<span class="layui-badge-dot layui-bg-green1"></span>'+" 在线";
+                            }else {
+                                return '<span class="layui-badge-dot"></span>'+" 离线";
+                            }
+                            }},
+                        {field: 'maxUp', align: 'center', title: '最大↑',templet:'#upTpl'},
+                        {field: 'maxDown', align: 'center', title: '最大↓',templet:'#downTpl'},
+                        {field: 'flow', align: 'center', title: '剩余流量',templet:'#flowTpl'},
+                        {field: 'money', align: 'center', title: '余额',templet:function(value){
+                            if(value.money < 0){
+                                return '<span class="layui-badge febs-bg-red">已欠费</span>';
+                            }
+                            return value.money + " 元";
+                            }},
+                        {width: 120, align: 'center', toolbar: "#tool", title: '操作'}
+                    ]
+                ]
+                , data: data
+                , even: true
+                , limit: data.length
+                , limits: [10, 20, 30, 50, 100]
+                , toolbar: '#toolbar'
+            });
+        };
+
+        table.on('toolbar(user_table)', function (obj) {
+
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'search':
+                    searchParam.nodeId = $("#userId").val();
+                    searchParam.credit = $("#credit").val();
+                    searchParam.username = $("#username").val();
+                    searchParam.pageNum = 1;
+                    CoreUtil.sendAjax("/sys/vpnuserflows", JSON.stringify(searchParam), function (res) {
+                        laypageTable(res.data.totalRows, searchParam.pageNum);
+                        if (res.data.list != null) {
+                            loadTable(res.data.list);
+                        }
+                    }, "POST", false, function (res) {
+                        layer.msg("抱歉！您暂无获取用户流量列表的权限");
+                        var noAuthorityData = [];
+                        loadTable(noAuthorityData);
+                    });
+                    break;
+            };
+        });
+        table.on('tool(user_table)', function (obj) {
+            var data = obj.data;
+            switch (obj.event) {
+                case 'edit':
+                    var down=2000;
+                    var myChart = echarts.init(document.getElementById('echars1'));
+                    var option = {tooltip: {
+                            formatter: "{a} <br/>{c} {b}"
+                        },
+                        toolbox: {
+                            show: true,
+                            feature: {
+                                restore: {show: true},
+                                saveAsImage: {show: true}
+                            }
+                        },
+                        series : [
+                            {
+                                name: '剩余流量',
+                                type: 'gauge',
+                                z: 3,
+                                min: 0,
+                                max: 10240,
+                                splitNumber: 5,
+                                radius: '50%',
+                                axisLine: {            // 坐标轴线
+                                    lineStyle: {       // 属性lineStyle控制线条样式
+                                        width: 10
+                                    }
+                                },
+                                axisTick: {            // 坐标轴小标记
+                                    length: 15,        // 属性length控制线长
+                                    lineStyle: {       // 属性lineStyle控制线条样式
+                                        color: 'auto'
+                                    }
+                                },
+                                splitLine: {           // 分隔线
+                                    length: 20,         // 属性length控制线长
+                                    lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                                        color: 'auto'
+                                    }
+                                },
+                                axisLabel: {
+                                    backgroundColor: 'auto',
+                                    borderRadius: 2,
+                                    color: '#eee',
+                                    padding: 3,
+                                    textShadowBlur: 2,
+                                    textShadowOffsetX: 1,
+                                    textShadowOffsetY: 1,
+                                    textShadowColor: '#222'
+                                },
+                                title: {
+                                    // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    fontWeight: 'bolder',
+                                    fontSize: 15,
+                                    fontStyle: 'italic'
+                                },
+                                data: [{value: data.flow, name: '剩余流量'}]
+                            },
+                            {
+                                name: '最大下载',
+                                type: 'gauge',
+                                center: ['20%', '55%'],    // 默认全局居中
+                                radius: '35%',
+                                min: 0,
+                                max: 1000,
+                                endAngle: 45,
+                                splitNumber: 5,
+                                axisLine: {            // 坐标轴线
+                                    lineStyle: {       // 属性lineStyle控制线条样式
+                                        width: 8
+                                    }
+                                },
+                                axisTick: {            // 坐标轴小标记
+                                    length: 12,        // 属性length控制线长
+                                    lineStyle: {       // 属性lineStyle控制线条样式
+                                        color: 'auto'
+                                    }
+                                },
+                                splitLine: {           // 分隔线
+                                    length: 20,         // 属性length控制线长
+                                    lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                                        color: 'auto'
+                                    }
+                                },
+                                pointer: {
+                                    width: 5
+                                },
+                                title: {
+                                    offsetCenter: [0, '-30%'],       // x, y，单位px
+                                },
+                                detail: {
+                                    // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    fontWeight: 'bolder'
+                                },
+                                data: [{value: data.maxDown, name: '最大下载'}]
+                            },
+                            {
+                                name: '余额',
+                                type: 'gauge',
+                                center: ['77%', '55%'],    // 默认全局居中
+                                radius: '35%',
+                                min: 0,
+                                max: 1000,
+                                startAngle:125,
+                                endAngle: -45,
+                                splitNumber: 5,
+                                axisLine: {            // 坐标轴线
+                                    lineStyle: {       // 属性lineStyle控制线条样式
+                                        width: 8
+                                    }
+                                },
+                                axisTick: {            // 坐标轴小标记
+                                    length: 12,        // 属性length控制线长
+                                    lineStyle: {       // 属性lineStyle控制线条样式
+                                        color: 'auto'
+                                    }
+                                },
+                                splitLine: {           // 分隔线
+                                    length: 20,         // 属性length控制线长
+                                    lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
+                                        color: 'auto'
+                                    }
+                                },
+                                pointer: {
+                                    width: 5
+                                },
+                                title: {
+                                    offsetCenter: [0, '-30%'],       // x, y，单位px
+                                },
+                                detail: {
+                                    // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    fontWeight: 'bolder'
+                                },
+                                data: [{value: data.money, name: '余额'}]
+                            }
+                        ]
+                    };
+                     myChart.setOption(option);
+                    slider.render({
+                        elem: '#slideUp',
+                        value:data.maxUp,
+                        max:1024,
+                        change:function(value){
+                            $(".operation_user input[name=maxUp]").val(value);
+                            layer.msg(value+" M/s");
+                        }
+                    });
+                    slider.render({
+                        elem: '#slideDown',
+                        value:data.maxDown,
+                        max:1024,
+                        change:function(value){
+                            $(".operation_user input[name=maxDown]").val(value);
+                            down = value;
+                            layer.msg(value+" M/s");
+                        }
+                    });
+                    $(".user_table_div").hide();
+                    $(".operation_user").show();
+                    $(".title").html("编辑用户流量设置");
+                    $(".operation_user input[name=id]").val(data.id);
+                    $(".operation_user input[name=username]").val(data.username);
+                    $(".operation_user input[name=credit]").val(data.credit);
+                    $(".operation_user input[name=money]").val(data.money);
+                    $(".operation_user input[name=flow]").val(data.flow);
+                    form.render(); //更新全部
+                    break;
+            }
+        });
+        $("#btn_cancel").click(function () {
+            $(".user_table_div").show();
+            $(".operation_user").hide();
+            return false;
+        });
+        form.on('switch(switch)', function () {
+            $(".operation_user input[name=status]").attr('type', 'hidden').val(this.checked ? 1 : 2);
+        });
+        form.on('submit(submit)', function (data) {
+            CoreUtil.sendAjax("/sys/vpnuserflow", JSON.stringify(data.field), function (res) {
+                $(".user_table_div").show();
+                $(".operation_user").hide();
+                $(".layui-laypage-btn").click();
+            }, "PUT", false, function (res) {
+                layer.msg("抱歉！您暂无编辑用户流量的权限");
+            });
+            return false;
+        });
+
+        let canvas = document.getElementById("c")
+        let ctx = canvas.getContext("2d")
+        let M = Math
+        let Sin = M.sin
+        let Cos = M.cos
+        let Sqrt = M.sqrt
+        let Pow = M.pow
+        let PI = M.PI
+        let Round = M.round
+        let oW = canvas.width = 250
+        let oH = canvas.height = 250
+        let lineWidth = 2 // 线宽
+        let r = (oW / 2) // 大半径
+        let cR = r - 10 * lineWidth
+        ctx.beginPath()
+        ctx.lineWidth = lineWidth
+
+        // 水波动画初始参数
+        let maxFlow=100
+        let currFlow = 68.5
+        let data = currFlow / maxFlow
+        let axisLength = 2 * r - 16 * lineWidth // Sin 图形长度
+        let unit = axisLength / 9 // 波浪宽
+        let range = .4 // 浪幅
+        let nowrange = range
+        let xoffset = 8 * lineWidth // x 轴偏移量
+        let sp = 0 // 周期偏移量
+        let nowdata = 0
+        let waveupsp = 0.006 // 水波上涨速度
+
+        // 圆动画初始参数
+        let arcStack = [] // 圆栈
+        let bR = r - 8 * lineWidth
+        let soffset = -(PI / 2) // 圆动画起始位置
+        let circleLock = true // 起始动画锁
+
+        // 获取圆动画轨迹点集
+        for (var i = soffset; i < soffset + 2 * PI; i += 1 / (8 * PI)) {
+            arcStack.push([
+                r + bR * Cos(i),
+                r + bR * Sin(i)
+            ])
+        }
+        // 圆起始点
+        let cStartPoint = arcStack.shift();
+        ctx.strokeStyle = "#1c86d1";
+        ctx.moveTo(cStartPoint[0], cStartPoint[1]);
+        // 开始渲染
+        render();
+
+        function drawSine() {
+            ctx.beginPath();
+            ctx.save();
+            var Stack = []; // 记录起始点和终点坐标
+            for (var i = xoffset; i <= xoffset + axisLength; i += 20 / axisLength) {
+                var x = sp + (xoffset + i) / unit;
+                var y = Sin(x) * nowrange;
+                var dx = i;
+                var dy = 2 * cR * (1 - nowdata) + (r - cR) - (unit * y);
+                ctx.lineTo(dx, dy);
+                Stack.push([dx, dy])
+            }
+            // 获取初始点和结束点
+            var startP = Stack[0]
+            var endP = Stack[Stack.length - 1]
+            ctx.lineTo(xoffset + axisLength, oW);
+            ctx.lineTo(xoffset, oW);
+            ctx.lineTo(startP[0], startP[1])
+            ctx.fillStyle = "#fbec99";
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawText() {
+            ctx.globalCompositeOperation = 'source-over';
+            var size = 0.4 * cR;
+            ctx.font = 'bold ' + size + 'px Microsoft Yahei';
+            let txt = (nowdata.toFixed(2) * 100).toFixed(0) + '`%';
+            var fonty = r + size / 2;
+            var fontx = r - size * 0.8;
+            ctx.fillStyle = "#f6b71e";
+            ctx.textAlign = 'center';
+            ctx.fillText(txt, r + 5, r + 20)
+        }
+        //最外面淡黄色圈
+        function drawCircle() {
+            ctx.beginPath();
+            ctx.lineWidth = 15;
+            ctx.strokeStyle = '#fff89d';
+            ctx.arc(r, r, cR + 7, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.restore();
+        }
+        //灰色圆圈
+        function grayCircle() {
+            ctx.beginPath();
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = '#eaeaea';
+            ctx.arc(r, r, cR - 5, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.restore();
+            ctx.beginPath();
+        }
+        //橘黄色进度圈
+        function orangeCircle() {
+            ctx.beginPath();
+            ctx.strokeStyle = '#fbdb32';
+            //使用这个使圆环两端是圆弧形状
+            ctx.lineCap = 'round';
+            ctx.arc(r, r, cR - 5, 0 * (Math.PI / 180.0) - (Math.PI / 2), (nowdata * 360) * (Math.PI / 180.0) - (Math.PI / 2));
+            ctx.stroke();
+            ctx.save()
+        }
+        //裁剪中间水圈
+        function clipCircle() {
+            ctx.beginPath();
+            ctx.arc(r, r, cR - 10, 0, 2 * Math.PI, false);
+            ctx.clip();
+        }
+        //渲染canvas
+        function render() {
+            ctx.clearRect(0, 0, oW, oH);
+            //最外面淡黄色圈
+            drawCircle();
+            //灰色圆圈
+            grayCircle();
+            //橘黄色进度圈
+            orangeCircle();
+            //裁剪中间水圈
+            clipCircle();
+            // 控制波幅
+            if (data >= 0.85) {
+                if (nowrange > range / 4) {
+                    var t = range * 0.01;
+                    nowrange -= t;
+                }
+            } else if (data <= 0.1) {
+                if (nowrange < range * 1.5) {
+                    var t = range * 0.01;
+                    nowrange += t;
+                }
+            } else {
+                if (nowrange <= range) {
+                    var t = range * 0.01;
+                    nowrange += t;
+                }
+                if (nowrange >= range) {
+                    var t = range * 0.01;
+                    nowrange -= t;
+                }
+            }
+            if ((data - nowdata) > 0) {
+                nowdata += waveupsp;
+            }
+            if ((data - nowdata) < 0) {
+                nowdata -= waveupsp
+            }
+            sp += 0.07;
+            // 开始水波动画
+            drawSine();
+            // 写字
+            drawText();
+            requestAnimationFrame(render)
+        }
+    });
+
+
+</script>
+<script>
+
+</script>
+</html>

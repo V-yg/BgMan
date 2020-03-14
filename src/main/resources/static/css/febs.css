@@ -3759,6 +3759,12 @@
 .febs-bg-purple {
     background: #722ed1
 }
+.febs-bg-flowcolor {
+    background: #8aadb1
+}
+.febs-bg-flowcolor1 {
+    background: #a9ea8b
+}
 
 .febs-alert {
     border: 1px solid #fff !important;

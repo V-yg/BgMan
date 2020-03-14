@@ -101,4 +101,13 @@ public class DataResult<T> {
 
         return new <T>DataResult(responseCode,data);
     }
+
+    @Override
+    public String toString() {
+        return "DataResult{" +
+                "code=" + code +
+                ", msg='" + msg + '\'' +
+                ", data=" + data +
+                '}';
+    }
 }

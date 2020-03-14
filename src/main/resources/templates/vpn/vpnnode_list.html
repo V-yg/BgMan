@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/css/form.css">
+    <script src="/layui/layui.all.js"></script>
+    <script src="/js/util.js"></script>
+    <link rel="stylesheet" href="/css/febs.css">
+</head>
+<body>
+<div class="panel panel-default operation_user" hidden>
+    <div class="panel-heading title" style="text-align: center"></div>
+    <div class="layui-card-body">
+        <form class="layui-form " action="" lay-filter="deptInfo" style="width: 700px;margin-top: 10px">
+            <input name="id" hidden/>
+            <div class="layui-form-item">
+                <label class="layui-form-label">节点名称</label>
+                <div class="layui-input-block">
+                    <input type="node" name="node" placeholder="节点名称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">IP</div>
+                <div class="layui-input-block">
+                    <input type="text"  name="ip" placeholder="请输入IP" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">端口</div>
+                <div class="layui-input-block">
+                    <input type="text"  lay-verify="number" name="port" placeholder="请输入端口" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div >
+                <div class="layui-form-label ">最大上传</div>
+                <div id = "slideUp" style="position:relative; left: 120px; top: 18px;max-width: 550px"></div>
+                <input type="text" name = "maxUp" hidden>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">最大下载</div>
+                <div id = "slideDown" style="position:relative; left: 120px; top: 18px;max-width: 550px"></div>
+                <input name = "maxDown" hidden>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">协议</div>
+                <div class="layui-input-block">
+                    <input type="text"  name="protocol" placeholder="请输入协议" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">链接地址</div>
+                <div class="layui-input-block">
+                    <input type="text"  name="link" placeholder="请输入链接地址" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div id = "delaydiv" class="layui-form-item">
+                <div class="layui-form-label ">延迟</div>
+                <div class="layui-input-block">
+                    <input type="text"   name="delay"  autocomplete="off" class="layui-input layui-disabled ">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="status" lay-skin="switch" lay-filter="switch" lay-text="启用|失效" checked>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+                    <button class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="user_table_div">
+    <div id="searchParam" shiro:hasPermission="sys:vpnnode:list">
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <input type="text" id="node" class="layui-input" autocomplete="off" placeholder="请输入节点名">
+            </div>
+            <div class="layui-input-inline layui-form ">
+                <select class="" id="status">
+                    <option value="">请选择节点状态</option>
+                    <option value="1">正常</option>
+                    <option value="2">失效</option>
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="createTime" placeholder="选择节点创建时间区间" style="width: 290px">
+            </div>
+        </div>
+    </div>
+    <table class="layui-hide" id="user_table" lay-filter="user_table"></table>
+    <div id="laypage" class= "$(" .layui-laypage-btn").click();"></div>
+</div>
+</body>
+<script type="text/html" id="toolbar">
+    <div class="layui-btn-group" id="search">
+        <button type="button" class="layui-btn" lay-event="search" >
+            <i class="layui-icon">&#xe615;</i> 开始检索
+        </button>
+    </div>
+    <div class="layui-btn-group">
+        <button type="button" class="layui-btn layui-btn-danger" lay-event="batchDeleted"
+                shiro:hasPermission="sys:vpnnode:deleted">
+            <i class="layui-icon">&#xe608;</i> 批量删除
+        </button>
+    </div>
+    <div class="layui-btn-group">
+        <button type="button" class="layui-btn layui-btn-normal" lay-event="addNewNode"
+                shiro:hasPermission="sys:vpnnode:add">
+            <i class="layui-icon">&#xe608;</i> 新增VPN节点
+        </button>
+    </div>
+</script>
+<script type="text/html" id="delayTpl">
+    <div>
+        {{# if (d.delay < 10) { }}
+        <span class="layui-badge febs-tag-green">{{d.delay}} ms</span>
+        {{# } else if (d.delay < 30) { }}
+        <span class="layui-badge febs-tag-cyan">{{d.delay}} ms</span>
+        {{# } else if (d.delay < 50) { }}
+        <span class="layui-badge febs-tag-orange">{{d.delay}} ms</span>
+        {{# } else if (d.delay < 100) { }}
+        <span class="layui-badge febs-tag-volcano">{{d.delay}} ms</span>
+        {{# } else { }}
+        <span class="layui-badge febs-tag-red">{{d.delay}} ms</span>
+        {{# } }}
+    </div>
+</script>
+<script type="text/html" id="upTpl">
+    <div>
+        <span class="layui-badge febs-bg-flowcolor">{{d.maxUp}} M/s</span>
+    </div>
+</script>
+<script type="text/html" id="downTpl">
+    <div>
+        <span class="layui-badge febs-bg-flowcolor">{{d.maxDown}} M/s</span>
+    </div>
+</script>
+<script type="text/html" id="tool">
+    <a class="layui-btn layui-btn-xs" lay-event="edit" shiro:hasPermission="sys:vpnnode:update">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" shiro:hasPermission="sys:vpnnode:deleted">删除</a>
+</script>
+
+<script>
+    var table = layui.table;
+    var laypage = layui.laypage
+    var form = layui.form;
+    var layer = layui.layer;
+    var $ = jQuery = layui.jquery;
+    var laydate = layui.laydate;
+    var tree = layui.tree;
+    var slider = layui.slider;
+    var transfer = layui.transfer;
+    layui.use(['table', 'laypage', 'layer', 'laydate', 'tree', 'transfer','slider'], function () {
+        form.render();
+        var searchParam = {
+            nodeId: null,
+            node: null,
+            status: null,
+            startTime: null,
+            endTime: null,
+            pageNum: 1,
+            pageSize: 10
+        }
+
+        CoreUtil.sendAjax("/sys/vpnnode", JSON.stringify(searchParam), function (res) {
+            laypageTable(res.data.totalRows, searchParam.pageNum);
+            if (res.data.list != null) {
+                loadTable(res.data.list);
+            }
+        }, "POST", false, function (res) {
+            layer.msg("抱歉！您暂无获取节点列表的权限");
+            var noAuthorityData = [];
+            loadTable(noAuthorityData);
+        });
+        var laypageTable = function (count, currentPage) {
+            laypage.render({
+                elem: 'laypage'
+                , count: count
+                , limit: searchParam.pageSize
+                , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                , curr: location.hash.replace('#!currentPage=', '') //获取起始页
+                , hash: 'currentPage' //自定义hash值
+                , jump: function (obj, first) {
+                    if (!first) {
+                        searchParam.pageNum = obj.curr;
+                        searchParam.pageSize = obj.limit;
+                        CoreUtil.sendAjax("/sys/vpnnode", JSON.stringify(searchParam), function (res) {
+                            if (res.data.list != null) {
+                                loadTable(res.data.list);
+                                laypageTable(res.data.totalRows, searchParam.pageNum);
+                            }
+                        }, "POST", false, function (res) {
+                            layer.msg("抱歉！您暂无获取节点列表的权限");
+                            var noAuthorityData = [];
+                            loadTable(noAuthorityData);
+                        });
+                    }
+                }
+            });
+        };
+        //渲染table
+        var loadTable = function (data) {
+            table.render({
+                elem: '#user_table'
+                , cols: [
+                    [
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'node', align: 'center', title: '节点'},
+                        {field: 'ip', align: 'center', title: 'IP', width: 138},
+                        {field: 'port', align: 'center', title: '端口', width: 100},
+                        {field: 'maxUp', align: 'center', title: '最大↑',templet:'#upTpl'},
+                        {field: 'maxDown', align: 'center', title: '最大↓',templet:'#downTpl'},
+                        {field: 'delay', align: 'center', title: '延迟',templet:'#delayTpl'},
+                        {
+                            field: 'createTime', align: 'center', title: '注册时间', width: 170, templet: function (item) {
+                                return CoreUtil.formattime(item.createTime);
+                            }
+                        },
+                        {
+                            field: 'status', align: 'center', title: '状态', width: 100, templet: function (item) {
+                                if (item.status === 1) {
+                                    return '  <input type="checkbox" lay-skin="switch" lay-text="正常|禁用" checked disabled>';
+                                }
+                                if (item.status === 2) {
+                                    return '  <input type="checkbox" lay-skin="switch" lay-text="正常|禁用" disabled>';
+                                }
+                            }
+                        },
+                        {field: 'protocol', align: 'center', title: '协议'},
+                        {field: 'link', align: 'center', title: '链接地址'},
+                        {width: 120, align: 'center', toolbar: "#tool", title: '操作'}
+                    ]
+                ]
+                , data: data
+                , even: true
+                , limit: data.length
+                , limits: [10, 20, 30, 50, 100]
+                , toolbar: '#toolbar'
+            });
+        };
+        laydate.render({
+            elem: '#createTime'
+            , type: 'datetime'
+            , range: '~'
+            , done: function (value, date, endDate) {
+                if (value != null && value != undefined && value != "") {
+                    searchParam.startTime = value.split("~")[0];
+                    searchParam.endTime = value.split("~")[1];
+                } else {
+                    searchParam.startTime = null;
+                    searchParam.endTime = null;
+                }
+            }
+        });
+
+
+        table.on('toolbar(user_table)', function (obj) {
+
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'batchDeleted':
+                    var checkStatus = table.checkStatus(obj.config.id);
+                    var data = checkStatus.data;
+                    if (data.length == 0) {
+                        layer.msg("请选择要批量删除的节点");
+                    } else {
+                        var nodeIds = [];
+                        $(data).each(function (index, item) {
+                            nodeIds.push(item.id);
+                        });
+                        tipDialog(nodeIds, "选中的");
+                    }
+                    break;
+                case 'addNewNode':
+                    slider.render({
+                        elem: '#slideDown',
+                        value:0,
+                        max:1024,
+                        change:function(value){
+                            $(".operation_user input[name=maxDown]").val(value);
+                            layer.msg(value+" M/s");
+                        }
+                    });
+                    slider.render({
+                        elem: '#slideUp',
+                        value:0,
+                        max:1024,
+                        change:function(value){
+                            $(".operation_user input[name=maxUp]").val(value);
+                            layer.msg(value+" M/s");
+                        }
+                    });
+                    form.render();
+                    $(".title").html("新增VPN节点");
+                    $(".user_table_div").hide();
+                    $(".operation_user").show();
+                    $(".operation_user input[name=id]").val("");
+                    $(".operation_user input[name=node]").val("");
+                    $(".operation_user input[name=ip]").val("");
+                    $(".operation_user input[name=port]").val("");
+                    $(".operation_user input[name=protocol]").val("");
+                    $(".operation_user input[name=link]").val("");
+                    $("#delaydiv").hide();
+                    $(".operation_user input[name=status]").attr('checked', 'checked');
+                    $(".operation_user input[name=status]").attr('type', 'hidden').val(1);
+                    var x = document.getElementsByClassName("layui-unselect layui-form-switch");
+                    x[0].setAttribute("class", "layui-unselect layui-form-switch layui-form-onswitch");
+                    var d = document.getElementsByTagName('em')[0];
+                    d.firstChild.nodeValue = '启用';
+                    form.render(); //更新全部
+                    break;
+                case 'search':
+                    searchParam.nodeId = $("#nodeId").val();
+                    searchParam.status = $("#status").val();
+                    searchParam.node = $("#node").val();
+                    searchParam.pageNum = 1;
+                    CoreUtil.sendAjax("/sys/vpnnode", JSON.stringify(searchParam), function (res) {
+                        laypageTable(res.data.totalRows, searchParam.pageNum);
+                        if (res.data.list != null) {
+                            loadTable(res.data.list);
+                        }
+                    }, "POST", false, function (res) {
+                        layer.msg("抱歉！您暂无获取节点列表的权限");
+                        var noAuthorityData = [];
+                        loadTable(noAuthorityData);
+                    });
+                    break;
+            }
+            ;
+        });
+        table.on('tool(user_table)', function (obj) {
+            var data = obj.data;
+            switch (obj.event) {
+                case 'del':
+                    var nodeIds = [];
+                    nodeIds.push(data.id);
+                    tipDialog(nodeIds, data.node);
+                    break;
+                case 'edit':
+                    var up;
+                    var down;
+                    slider.render({
+                        elem: '#slideUp',
+                        value:data.maxUp,
+                        max:1024,
+                        change:function(value){
+                            $(".operation_user input[name=maxUp]").val(value);
+                            layer.msg(value+" M/s");
+                        }
+                    });
+                    slider.render({
+                        elem: '#slideDown',
+                        value:data.maxDown,
+                        max:1024,
+                        change:function(value){
+                            $(".operation_user input[name=maxDown]").val(value);
+                            layer.msg(value+" M/s");
+                        }
+                    });
+                    $(".user_table_div").hide();
+                    $(".operation_user").show();
+                    $(".title").html("编辑节点");
+                    $(".operation_user input[name=id]").val(data.id);
+                    $(".operation_user input[name=node]").val(data.node);
+                    $(".operation_user input[name=ip]").val(data.ip);
+                    $(".operation_user input[name=port]").val(data.port);
+                    $(".operation_user input[name=protocol]").val(data.protocol);
+                    $(".operation_user input[name=link]").val(data.link);
+                    $(".operation_user input[name=delay]").val(data.delay+"ms");
+                    if (data.status == 1) {
+                        $(".operation_user input[name=status]").attr('checked', 'checked');
+                        $(".operation_user input[name=status]").attr('type', 'hidden').val(1);
+                        var x = document.getElementsByClassName("layui-unselect layui-form-switch");
+                        x[0].setAttribute("class", "layui-unselect layui-form-switch layui-form-onswitch");
+                        var d = document.getElementsByTagName('em')[0];
+                        d.firstChild.nodeValue = '启用';
+                    } else {
+                        $(".operation_user input[name=status]").attr('type', 'hidden').removeAttr("checked").val(2);
+                        var x = document.getElementsByClassName("layui-unselect layui-form-switch");
+                        x[0].setAttribute("class", "layui-unselect layui-form-switch");
+                        var d = document.getElementsByTagName('em')[0];
+                        d.firstChild.nodeValue = '禁用';
+                    }
+                    form.render(); //更新全部
+                    break;
+            }
+        });
+        $("#btn_cancel").click(function () {
+            $(".user_table_div").show();
+            $(".operation_user").hide();
+            return false;
+        });
+        var tipDialog = function (nodeIds, node) {
+            layer.open({
+                content: '确定要删除' + node + "节点么?",
+                yes: function (index, layero) {
+                    layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    CoreUtil.sendAjax("/sys/vpnnode", JSON.stringify(nodeIds), function (res) {
+                        layer.msg(res.msg);
+                        $(".layui-laypage-btn").click();
+                    }, "DELETE", false, function (res) {
+                        layer.msg("抱歉！您暂无删除节点的权限");
+                    });
+                }
+            });
+        };
+        form.on('switch(switch)', function () {
+            $(".operation_user input[name=status]").attr('type', 'hidden').val(this.checked ? 1 : 2);
+
+        });
+        form.on('submit(submit)', function (data) {
+            if (data.field.id === undefined || data.field.id === null || data.field.id === "") {
+                CoreUtil.sendAjax("/sys/vpnnodeadd", JSON.stringify(data.field), function (res) {
+                    $(".user_table_div").show();
+                    $(".operation_user").hide();
+                    $(".layui-laypage-btn").click();
+                }, "POST", false, function (res) {
+                    layer.msg("抱歉！您暂无新增节点的权限");
+                });
+            } else {
+                CoreUtil.sendAjax("/sys/vpnnode", JSON.stringify(data.field), function (res) {
+                    $(".user_table_div").show();
+                    $(".operation_user").hide();
+                    $(".layui-laypage-btn").click();
+                }, "PUT", false, function (res) {
+                    layer.msg("抱歉！您暂无编辑节点的权限");
+                });
+            }
+            return false;
+        });
+    });
+</script>
+</html>

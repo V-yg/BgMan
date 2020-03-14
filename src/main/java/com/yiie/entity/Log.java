@@ -24,8 +24,6 @@ public class Log implements Serializable {
 
     private String method;
 
-
-
     private String params;
 
     private String ip;

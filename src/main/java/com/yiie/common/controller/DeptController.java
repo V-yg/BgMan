@@ -56,6 +56,7 @@ public class DeptController {
         result.setData(deptService.addDept(vo));
         return result;
     }
+
     @DeleteMapping("/dept/{id}")
     @ApiOperation(value = "删除组织接口")
     @LogAnnotation(title = "机构管理",action = "删除组织")

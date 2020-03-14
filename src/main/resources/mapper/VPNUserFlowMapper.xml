@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiie.common.mapper.VPNUserFlowMapper">
+    <resultMap id="BaseResultMap" type="com.yiie.entity.VPNUserFlow">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="credit" jdbcType="INTEGER" property="credit"/>
+        <result column="connect" jdbcType="INTEGER" property="connect"/>
+        <result column="money" jdbcType="INTEGER" property="money"/>
+        <result column="flow" jdbcType="INTEGER" property="flow"/>
+        <result column="max_up" jdbcType="INTEGER" property="maxUp"/>
+        <result column="max_down" jdbcType="INTEGER" property="maxDown"/>
+        <result column="deleted" jdbcType="INTEGER" property="deleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, username,connect,credit,money,flow,max_up, max_down,deleted
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.yiie.vo.request.VPNUserFlowPageReqVO">
+        select
+        <include refid="Base_Column_List"></include>
+        from vpn_user
+        <where>
+            deleted=1
+            <if test="username!=null and username!=''">
+                AND username LIKE concat('%',#{username},'%')
+            </if>
+            <if test="credit == 1">
+                AND credit >= 90
+            </if>
+            <if test="credit == 2">
+                AND credit between 80 and 89
+            </if>
+            <if test="credit == 3">
+                AND credit between 60 and 79
+            </if>
+            <if test="credit == 4">
+                AND credit between 0 and 59
+            </if>
+        </where>
+        order by create_time DESC
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from vpn_user
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.yiie.entity.VPNUserFlow">
+        update vpn_user
+        <set>
+            <if test="credit != null">
+                credit = #{credit,jdbcType=INTEGER},
+            </if>
+            <if test="money != null">
+                money = #{money,jdbcType=INTEGER},
+            </if>
+            <if test="flow != null">
+                flow = #{flow,jdbcType=INTEGER},
+            </if>
+            <if test="maxUp != null">
+                max_up = #{maxUp,jdbcType=INTEGER},
+            </if>
+            <if test="maxDown != null">
+                max_down = #{maxDown,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

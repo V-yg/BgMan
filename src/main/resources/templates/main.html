@@ -1,10 +1,311 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link rel="stylesheet" href="/css/stylee.css">
+    <script src="https://cdn.bootcss.com/echarts/4.6.0/echarts.min.js"></script>
+    <script src="/layui/layui.all.js"></script>
+    <script src="/js/util.js"></script>
 </head>
 <body>
-<h1>后台首页</h1>
+<div class="container-scroller">
+    <div class="container-fluid page-body-wrapper">
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="row" >
+                    <div class="col-md-3 stretch-card grid-margin">
+                        <div class="card bg-gradient-danger card-img-holder text-white">
+                            <div class="card-body">
+                                <img src="/images/circle.svg" class="card-img-absolute" alt="circle-image"/>
+                                <h4 class="font-weight-normal mb-3" >累计访问量
+                                    <i class="mdi mdi-chart-line mdi-24px float-right"></i>
+                                </h4>
+                                <h2 class="mb-5" style="text-align: center;font-size: 40px;margin-top: 15px" id="totalSuccessLoginCnt"></h2>
+                                <h6 class="card-text">Email: yiie315@163.com</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 stretch-card grid-margin">
+                        <div class="card bg-gradient-info card-img-holder text-white">
+                            <div class="card-body">
+                                <img src="/images/circle.svg" class="card-img-absolute" alt="circle-image"/>
+                                <h4 class="font-weight-normal mb-3" >今日访问量
+                                    <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+                                </h4>
+                                <h2 class="mb-5" style="text-align: center;font-size: 40px;margin-top: 15px;" id="todaySuccessLoginCnt"></h2>
+                                <h6 class="card-text">每一天都要活力满满！</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 stretch-card grid-margin">
+                        <div class="card bg-gradient-success card-img-holder text-white">
+                            <div class="card-body">
+                                <img src="/images/circle.svg" class="card-img-absolute" alt="circle-image"/>
+                                <h4 class="font-weight-normal mb-3">近一周访问量
+                                    <i class="mdi mdi-diamond mdi-24px float-right"></i>
+                                </h4>
+                                <h2 class="mb-5" style="text-align: center;font-size: 40px;margin-top: 15px" id="weekSuccessLoginCnt"></h2>
+                                <h6 class="card-text">微笑面对未来！</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 stretch-card grid-margin">
+                        <div class="card bg-gradient-secondary card-img-holder text-white">
+                            <div class="card-body">
+                                <img src="/images/circle.svg" class="card-img-absolute" alt="circle-image"/>
+                                <h4 class="font-weight-normal mb-3">登录失败数
+                                    <i class="mdi mdi-diamond mdi-24px float-right"></i>
+                                </h4>
+                                <h2 class="mb-5" style="text-align: center;font-size: 40px;margin-top: 15px" id="todayFailLoginCnt"></h2>
+                                <h6 class="card-text">累计登录失败数: <span id="totalFailLoginCnt"></span></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-7 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">过去一周访问人数 Visitor</h4>
+                                <div id="echars1" style="width: 100%;height: 350px;margin-top: 10px;margin-left: 20px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">剩余资源百分比 Resource</h4>
+                                <canvas id="c" style="margin-top: 50px;margin-left: 80px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
+<script>
+    var $ = jQuery = layui.jquery;
+    var myChart = echarts.init(document.getElementById('echars1'));
+    option = {
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: []
+        },
+        yAxis: {
+            type: 'value'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985'
+                }
+            }
+        },
+        toolbox: {
+            feature: {
+            magicType: {show: true, type: ['bar','scroll']},
+            restore: {show: true},
+            saveAsImage: {show: true}
+            }
+        },
+        series: [{
+            data: [],
+            type: 'line',
+            areaStyle: {}
+        }]
+    };
+    myChart.setOption(option);
+    let rate = 0;
+    CoreUtil.sendAjax("/sys/main", null, function (res) {
+        $('#totalSuccessLoginCnt').html(res.data.totalSuccessLoginCnt);
+        $('#todaySuccessLoginCnt').html(res.data.todaySuccessLoginCnt);
+        $('#weekSuccessLoginCnt').html(res.data.weekSuccessLoginCnt);
+        $('#todayFailLoginCnt').html(res.data.todayFailLoginCnt);
+        $('#totalFailLoginCnt').html(res.data.totalFailLoginCnt);
+        rate = res.data.resourceRate;
+        if(res.data != null){
+            myChart.setOption({
+                xAxis: {
+                    data: res.data.dateNameList
+                },
+                series: [{
+                    data: res.data.loginCntList
+                }]
+            });
+        }
+    }, "POST", false, function (res) {
+        alert("图表数据请求失败！")
+    });
+
+    let canvas = document.getElementById("c")
+    let ctx = canvas.getContext("2d")
+    let M = Math
+    let Sin = M.sin
+    let Cos = M.cos
+    let Sqrt = M.sqrt
+    let Pow = M.pow
+    let PI = M.PI
+    let Round = M.round
+    let oW = canvas.width = 250
+    let oH = canvas.height = 250
+    let lineWidth = 2 // 线宽
+    let r = (oW / 2) // 大半径
+    let cR = r - 10 * lineWidth
+    ctx.beginPath()
+    ctx.lineWidth = lineWidth
+
+    // 水波动画初始参数
+    let data = 0.68
+    let axisLength = 2 * r - 16 * lineWidth // Sin 图形长度
+    let unit = axisLength / 9 // 波浪宽
+    let range = .4 // 浪幅
+    let nowrange = range
+    let xoffset = 8 * lineWidth // x 轴偏移量
+    let sp = 0 // 周期偏移量
+    let nowdata = 0
+    let waveupsp = 0.006 // 水波上涨速度
+
+    // 圆动画初始参数
+    let arcStack = [] // 圆栈
+    let bR = r - 8 * lineWidth
+    let soffset = -(PI / 2) // 圆动画起始位置
+    let circleLock = true // 起始动画锁
+
+    // 获取圆动画轨迹点集
+    for (var i = soffset; i < soffset + 2 * PI; i += 1 / (8 * PI)) {
+        arcStack.push([
+            r + bR * Cos(i),
+            r + bR * Sin(i)
+        ])
+    }
+    // 圆起始点
+    let cStartPoint = arcStack.shift();
+    ctx.strokeStyle = "#1c86d1";
+    ctx.moveTo(cStartPoint[0], cStartPoint[1]);
+    // 开始渲染
+    render();
+
+    function drawSine() {
+        ctx.beginPath();
+        ctx.save();
+        var Stack = []; // 记录起始点和终点坐标
+        for (var i = xoffset; i <= xoffset + axisLength; i += 20 / axisLength) {
+            var x = sp + (xoffset + i) / unit;
+            var y = Sin(x) * nowrange;
+            var dx = i;
+            var dy = 2 * cR * (1 - nowdata) + (r - cR) - (unit * y);
+            ctx.lineTo(dx, dy);
+            Stack.push([dx, dy])
+        }
+        // 获取初始点和结束点
+        var startP = Stack[0]
+        var endP = Stack[Stack.length - 1]
+        ctx.lineTo(xoffset + axisLength, oW);
+        ctx.lineTo(xoffset, oW);
+        ctx.lineTo(startP[0], startP[1])
+        ctx.fillStyle = "#fbec99";
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawText() {
+        ctx.globalCompositeOperation = 'source-over';
+        var size = 0.4 * cR;
+        ctx.font = 'bold ' + size + 'px Microsoft Yahei';
+        let txt = (nowdata.toFixed(2) * 100).toFixed(0) + '`%';
+        var fonty = r + size / 2;
+        var fontx = r - size * 0.8;
+        ctx.fillStyle = "#f6b71e";
+        ctx.textAlign = 'center';
+        ctx.fillText(txt, r + 5, r + 20)
+    }
+    //最外面淡黄色圈
+    function drawCircle() {
+        ctx.beginPath();
+        ctx.lineWidth = 15;
+        ctx.strokeStyle = '#fff89d';
+        ctx.arc(r, r, cR + 7, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.restore();
+    }
+    //灰色圆圈
+    function grayCircle() {
+        ctx.beginPath();
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = '#eaeaea';
+        ctx.arc(r, r, cR - 5, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.restore();
+        ctx.beginPath();
+    }
+    //橘黄色进度圈
+    function orangeCircle() {
+        ctx.beginPath();
+        ctx.strokeStyle = '#fbdb32';
+        //使用这个使圆环两端是圆弧形状
+        ctx.lineCap = 'round';
+        ctx.arc(r, r, cR - 5, 0 * (Math.PI / 180.0) - (Math.PI / 2), (nowdata * 360) * (Math.PI / 180.0) - (Math.PI / 2));
+        ctx.stroke();
+        ctx.save()
+    }
+    //裁剪中间水圈
+    function clipCircle() {
+        ctx.beginPath();
+        ctx.arc(r, r, cR - 10, 0, 2 * Math.PI, false);
+        ctx.clip();
+    }
+    //渲染canvas
+    function render() {
+        ctx.clearRect(0, 0, oW, oH);
+        //最外面淡黄色圈
+        drawCircle();
+        //灰色圆圈
+        grayCircle();
+        //橘黄色进度圈
+        orangeCircle();
+        //裁剪中间水圈
+        clipCircle();
+        // 控制波幅
+        if (data >= 0.85) {
+            if (nowrange > range / 4) {
+                var t = range * 0.01;
+                nowrange -= t;
+            }
+        } else if (data <= 0.1) {
+            if (nowrange < range * 1.5) {
+                var t = range * 0.01;
+                nowrange += t;
+            }
+        } else {
+            if (nowrange <= range) {
+                var t = range * 0.01;
+                nowrange += t;
+            }
+            if (nowrange >= range) {
+                var t = range * 0.01;
+                nowrange -= t;
+            }
+        }
+        if ((data - nowdata) > 0) {
+            nowdata += waveupsp;
+        }
+        if ((data - nowdata) < 0) {
+            nowdata -= waveupsp
+        }
+        sp += 0.07;
+        // 开始水波动画
+        drawSine();
+        // 写字
+        drawText();
+        requestAnimationFrame(render)
+
+
+
+    }
+</script>

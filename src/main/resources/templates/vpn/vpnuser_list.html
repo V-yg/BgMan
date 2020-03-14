@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>VPN用户列表</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/css/form.css">
+    <script src="/layui/layui.all.js"></script>
+    <script src="/js/util.js"></script>
+</head>
+<body>
+<div class="panel panel-default operation_user" hidden>
+    <div class="panel-heading title" style="text-align: center"></div>
+    <div class="layui-card-body">
+        <form class="layui-form " action="" lay-filter="deptInfo" style="width: 700px;margin-top: 10px">
+            <input name="id" hidden/>
+            <div class="layui-form-item">
+                <label class="layui-form-label">账号</label>
+                <div class="layui-input-block">
+                    <input type="username" name="username" placeholder="请输入账号" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">邮箱</div>
+                <div class="layui-input-block">
+                    <input type="text" lay-verify="email" name="email" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-form-label ">会员等级</div>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline layui-form">
+                        <select name="level">
+                            <option value="">请选择等级</option>
+                            <option value="钻石会员">钻石会员</option>
+                            <option value="铂金会员">铂金会员</option>
+                            <option value="黄金会员">黄金会员</option>
+                            <option value="大众会员">大众会员</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="status" lay-skin="switch" lay-filter="switch" lay-text="启用|禁用" checked>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+                    <button class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="user_table_div">
+    <div id="searchParam" shiro:hasPermission="sys:vpnuser:list">
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <input type="text" id="username" class="layui-input" autocomplete="off" placeholder="请输入用户名">
+            </div>
+            <div class="layui-input-inline layui-form">
+                <select id="level">
+                    <option value="">请选择等级</option>
+                    <option value="钻石会员">钻石会员</option>
+                    <option value="铂金会员">铂金会员</option>
+                    <option value="黄金会员">黄金会员</option>
+                    <option value="大众会员">大众会员</option>
+                </select>
+            </div>
+            <div class="layui-input-inline layui-form ">
+                <select class="" id="status">
+                    <option value="">请选择账号状态</option>
+                    <option value="1">正常</option>
+                    <option value="2">被锁定</option>
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="createTime" placeholder="选择创建时间区间" style="width: 290px">
+            </div>
+        </div>
+    </div>
+    <table class="layui-hide" id="user_table" lay-filter="user_table"></table>
+    <div id="laypage" class= "$(" .layui-laypage-btn").click();"></div>
+</div>
+</body>
+<script type="text/html" id="toolbar">
+    <div class="layui-btn-group" id="search">
+        <button type="button" class="layui-btn" lay-event="search" >
+            <i class="layui-icon">&#xe615;</i> 开始检索
+        </button>
+    </div>
+    <div class="layui-btn-group">
+        <button type="button" class="layui-btn layui-btn-danger" lay-event="batchDeleted"
+                shiro:hasPermission="sys:vpnuser:deleted">
+            <i class="layui-icon">&#xe608;</i> 批量删除
+        </button>
+    </div>
+    <div class="layui-btn-group">
+        <button type="button" class="layui-btn layui-btn-normal" lay-event="addNewUser"
+                shiro:hasPermission="sys:vpnuser:add">
+            <i class="layui-icon">&#xe608;</i> 新增VPN用户
+        </button>
+    </div>
+</script>
+<script type="text/html" id="tool">
+    <a class="layui-btn layui-btn-xs" lay-event="edit" shiro:hasPermission="sys:vpnuser:update">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" shiro:hasPermission="sys:vpnuser:deleted">删除</a>
+</script>
+<script type="text/html" id="levelTpl">
+    {{#  if(d.level === "大众会员"){ }}
+    <span style="color: #cddbe2;">大众会员</span>
+    {{#  } else if(d.level === "黄金会员"){ }}
+    <span style="color: #f5d211;">黄金会员</span>
+    {{#  } else if(d.level === "铂金会员"){ }}
+    <span style="color: #f8130e;">铂金会员</span>
+    {{#  } else{ }}
+    <span style="color: #f813ee;">钻石会员</span>
+    {{#  } }}
+</script>
+
+<script>
+    var table = layui.table;
+    var laypage = layui.laypage
+    var form = layui.form;
+    var layer = layui.layer;
+    var $ = jQuery = layui.jquery;
+    var laydate = layui.laydate;
+    var tree = layui.tree;
+    var transfer = layui.transfer;
+    layui.use(['table', 'laypage', 'layer', 'laydate', 'tree', 'transfer'], function () {
+        form.render();
+        var searchParam = {
+            userId: null,
+            username: null,
+            level:null,
+            status: null,
+            startTime: null,
+            endTime: null,
+            pageNum: 1,
+            pageSize: 10
+        }
+        CoreUtil.sendAjax("/sys/vpnusers", JSON.stringify(searchParam), function (res) {
+            laypageTable(res.data.totalRows, searchParam.pageNum);
+            if (res.data.list != null) {
+                loadTable(res.data.list);
+            }
+        }, "POST", false, function (res) {
+            layer.msg("抱歉！您暂无获取用户列表的权限");
+            var noAuthorityData = [];
+            loadTable(noAuthorityData);
+        });
+        var laypageTable = function (count, currentPage) {
+            laypage.render({
+                elem: 'laypage'
+                , count: count
+                , limit: searchParam.pageSize
+                , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                , curr: location.hash.replace('#!currentPage=', '') //获取起始页
+                , hash: 'currentPage' //自定义hash值
+                , jump: function (obj, first) {
+                    if (!first) {
+                        searchParam.pageNum = obj.curr;
+                        searchParam.pageSize = obj.limit;
+                        CoreUtil.sendAjax("/sys/vpnusers", JSON.stringify(searchParam), function (res) {
+                            if (res.data.list != null) {
+                                loadTable(res.data.list);
+                                laypageTable(res.data.totalRows, searchParam.pageNum);
+                            }
+                        }, "POST", false, function (res) {
+                            layer.msg("抱歉！您暂无获取用户列表的权限");
+                            var noAuthorityData = [];
+                            loadTable(noAuthorityData);
+                        });
+                    }
+                }
+            });
+        };
+        //渲染table
+        var loadTable = function (data) {
+            table.render({
+                elem: '#user_table'
+                , cols: [
+                    [
+                        {type: 'checkbox', fixed: 'left'},
+                        {field: 'username', align: 'center', title: '用户名'},
+                        {field: 'email', align: 'center', title: '邮箱'},
+                        {field: 'level', align: 'center', title: '等级', templet: '#levelTpl'},
+                        {
+                            field: 'createTime', align: 'center', title: '注册时间', width: 170, templet: function (item) {
+                                return CoreUtil.formattime(item.createTime);
+                            }
+                        },
+                        {
+                            field: 'expirationTime', align: 'center', title: '会员过期时间', width: 170, templet: function (item) {
+                                return CoreUtil.formattime(item.expirationTime);
+                            }
+                        },
+                        {
+                            field: 'lastLogin', align: 'center', title: '上次登录', width: 170, templet: function (item) {
+                                return CoreUtil.formattime1(item.lastLogin);
+                            }
+                        },
+                        {
+                            field: 'status', align: 'center', title: '状态', width: 100, templet: function (item) {
+                                if (item.status === 1) {
+                                    return '  <input type="checkbox" lay-skin="switch" lay-text="正常|禁用" checked disabled>';
+                                }
+                                if (item.status === 2) {
+                                    return '  <input type="checkbox" lay-skin="switch" lay-text="正常|禁用" disabled>';
+                                }
+                            }
+                        },
+
+                        {width: 180, align: 'center', toolbar: "#tool", title: '操作'}
+                    ]
+                ]
+                , data: data
+                , even: true
+                , limit: data.length
+                , limits: [10, 20, 30, 50, 100]
+                , toolbar: '#toolbar'
+            });
+        };
+        laydate.render({
+            elem: '#createTime'
+            , type: 'datetime'
+            , range: '~'
+            , done: function (value, date, endDate) {
+                if (value != null && value != undefined && value != "") {
+                    searchParam.startTime = value.split("~")[0];
+                    searchParam.endTime = value.split("~")[1];
+                } else {
+                    searchParam.startTime = null;
+                    searchParam.endTime = null;
+                }
+            }
+        });
+
+
+        table.on('toolbar(user_table)', function (obj) {
+
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'batchDeleted':
+                    var checkStatus = table.checkStatus(obj.config.id);
+                    var data = checkStatus.data;
+                    if (data.length == 0) {
+                        layer.msg("请选择要批量删除的用户");
+                    } else {
+                        var userIds = [];
+                        $(data).each(function (index, item) {
+                            userIds.push(item.id);
+                        });
+                        tipDialog(userIds, "选中的");
+                    }
+                    break;
+                case 'addNewUser':
+                    form.render();
+                    $(".title").html("新增VPN用户");
+                    $(".user_table_div").hide();
+                    $(".operation_user").show();
+                    $(".operation_user input[name=id]").val("");
+                    $(".operation_user input[name=username]").val("");
+                    $(".operation_user input[name=level]").val("");
+                    $(".operation_user input[name=status]").attr('checked', 'checked');
+                    $(".operation_user input[name=status]").attr('type', 'hidden').val(1);
+                    var x = document.getElementsByClassName("layui-unselect layui-form-switch");
+                    x[0].setAttribute("class", "layui-unselect layui-form-switch layui-form-onswitch");
+                    var d = document.getElementsByTagName('em')[0];
+                    d.firstChild.nodeValue = '启用';
+                    form.render(); //更新全部
+                    break;
+                case 'search':
+                    searchParam.userId = $("#userId").val();
+                    searchParam.level = $("#level").val();
+                    searchParam.status = $("#status").val();
+                    searchParam.username = $("#username").val();
+                    searchParam.pageNum = 1;
+                    CoreUtil.sendAjax("/sys/vpnusers", JSON.stringify(searchParam), function (res) {
+                        laypageTable(res.data.totalRows, searchParam.pageNum);
+                        if (res.data.list != null) {
+                            loadTable(res.data.list);
+                        }
+                    }, "POST", false, function (res) {
+                        layer.msg("抱歉！您暂无获取用户列表的权限");
+                        var noAuthorityData = [];
+                        loadTable(noAuthorityData);
+                    });
+                    break;
+            }
+            ;
+        });
+        table.on('tool(user_table)', function (obj) {
+            var data = obj.data;
+            switch (obj.event) {
+                case 'del':
+                    var userIds = [];
+                    userIds.push(data.id);
+                    tipDialog(userIds, data.username);
+                    break;
+                case 'edit':
+                    $(".user_table_div").hide();
+                    $(".operation_user").show();
+                    $(".title").html("编辑用户");
+                    $(".operation_user input[name=id]").val(data.id);
+                    $(".operation_user input[name=username]").val(data.username);
+                    $(".operation_user input[name=email]").val(data.email);
+                    $(".operation_user input[name=level]").val(data.level);
+                    if (data.status == 1) {
+                        $(".operation_user input[name=status]").attr('checked', 'checked');
+                        $(".operation_user input[name=status]").attr('type', 'hidden').val(1);
+                        var x = document.getElementsByClassName("layui-unselect layui-form-switch");
+                        x[0].setAttribute("class", "layui-unselect layui-form-switch layui-form-onswitch");
+                        var d = document.getElementsByTagName('em')[0];
+                        d.firstChild.nodeValue = '启用';
+                    } else {
+                        $(".operation_user input[name=status]").attr('type', 'hidden').removeAttr("checked").val(2);
+                        var x = document.getElementsByClassName("layui-unselect layui-form-switch");
+                        x[0].setAttribute("class", "layui-unselect layui-form-switch");
+                        var d = document.getElementsByTagName('em')[0];
+                        d.firstChild.nodeValue = '禁用';
+                    }
+                    form.render(); //更新全部
+                    break;
+            }
+        });
+        $("#btn_cancel").click(function () {
+            $(".user_table_div").show();
+            $(".operation_user").hide();
+            return false;
+        });
+        var tipDialog = function (userIds, username) {
+            layer.open({
+                content: '确定要删除' + username + "用户么?",
+                yes: function (index, layero) {
+                    layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    CoreUtil.sendAjax("/sys/vpnuser", JSON.stringify(userIds), function (res) {
+                        layer.msg(res.msg);
+                        $(".layui-laypage-btn").click();
+                    }, "DELETE", false, function (res) {
+                        layer.msg("抱歉！您暂无删除用户的权限");
+                    });
+                }
+            });
+        };
+        form.on('switch(switch)', function () {
+            $(".operation_user input[name=status]").attr('type', 'hidden').val(this.checked ? 1 : 2);
+
+        });
+        form.on('submit(submit)', function (data) {
+            if (data.field.id === undefined || data.field.id === null || data.field.id === "") {
+                CoreUtil.sendAjax("/sys/vpnuser", JSON.stringify(data.field), function (res) {
+                    $(".user_table_div").show();
+                    $(".operation_user").hide();
+                    $(".layui-laypage-btn").click();
+                }, "POST", false, function (res) {
+                    layer.msg("抱歉！您暂无新增用户的权限");
+                });
+            } else {
+                CoreUtil.sendAjax("/sys/vpnuser", JSON.stringify(data.field), function (res) {
+                    $(".user_table_div").show();
+                    $(".operation_user").hide();
+                    $(".layui-laypage-btn").click();
+                }, "PUT", false, function (res) {
+                    layer.msg("抱歉！您暂无编辑用户的权限");
+                });
+            }
+            return false;
+        });
+    });
+</script>
+</html>

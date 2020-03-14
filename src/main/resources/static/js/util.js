@@ -1,3 +1,4 @@
+
 /*CoreUtil*/
 /*工具类，类似java静态工具类*/
 var CoreUtil = (function () {
@@ -121,6 +122,17 @@ var CoreUtil = (function () {
         var ss=date.getSeconds();
         ss=ss>9?ss:('0'+ss);
         var time=year+'-'+month+'-'+day+' '+hh+':'+mm+':'+ss;
+        return time;
+    };
+
+    coreUtil.formattime1=function (val) {
+        var date=new Date(val);
+        var year=date.getFullYear();
+        var month=date.getMonth()+1;
+        month=month>9?month:('0'+month);
+        var day=date.getDate();
+        day=day>9?day:('0'+day);
+        var time=year+'-'+month+'-'+day;
         return time;
     };
     return coreUtil;

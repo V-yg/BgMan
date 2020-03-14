@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiie.common.mapper.VPNNodeMapper">
+    <resultMap id="BaseResultMap" type="com.yiie.entity.VPNNode">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="node" jdbcType="VARCHAR" property="node" />
+        <result column="ip" jdbcType="VARCHAR" property="ip" />
+        <result column="port" jdbcType="INTEGER" property="port" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="deleted" jdbcType="INTEGER" property="deleted" />
+        <result column="protocol" jdbcType="VARCHAR" property="protocol" />
+        <result column="max_up" jdbcType="INTEGER" property="maxUp" />
+        <result column="max_down" jdbcType="INTEGER" property="maxDown" />
+        <result column="delay" jdbcType="INTEGER" property="delay" />
+        <result column="link" jdbcType="VARCHAR" property="link" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    id, node, ip, port, status, protocol,deleted
+    , max_up, max_down, delay, link, create_time
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap" parameterType="com.yiie.vo.request.VPNNodePageReqVO">
+        select
+        <include refid="Base_Column_List"></include>
+        from vpn_node
+        <where>
+            deleted=1
+            <if test="node!=null and node!=''">
+                AND node LIKE concat('%',#{node},'%')
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                AND create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                AND create_time &lt;= #{endTime}
+            </if>
+            <if test="nodeId!=null and nodeId!='' ">
+                AND id=#{nodeId}
+            </if>
+            <if test="status!=null and status!='' or status==0 ">
+                AND `status`=#{status}
+            </if>
+        </where>
+        order by create_time DESC
+    </select>
+
+    <update id="deletedNodes">
+        update vpn_node
+        <set>
+            deleted = 0,
+        </set>
+        where id in
+        <foreach collection="list" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <insert id="insertSelective" parameterType="com.yiie.entity.VPNNode">
+        insert into vpn_node
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="node != null">
+                node,
+            </if>
+            <if test="ip != null">
+                ip,
+            </if>
+            <if test="port != null">
+                port,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="protocol != null">
+                protocol,
+            </if>
+            <if test="maxUp != null">
+                max_up,
+            </if>
+            <if test="maxDown != null">
+                max_down,
+            </if>
+            <if test="delay != null">
+                delay,
+            </if>
+            <if test="link != null">
+                link,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="node != null">
+                #{node,jdbcType=VARCHAR},
+            </if>
+            <if test="ip != null">
+                #{ip,jdbcType=VARCHAR},
+            </if>
+            <if test="port != null">
+                #{port,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="protocol != null">
+                #{protocol,jdbcType=VARCHAR},
+            </if>
+            <if test="maxUp != null">
+                #{maxUp,jdbcType=INTEGER},
+            </if>
+            <if test="maxDown != null">
+                #{maxDown,jdbcType=INTEGER},
+            </if>
+            <if test="delay != null">
+                #{delay,jdbcType=INTEGER},
+            </if>
+            <if test="link != null">
+                #{link,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from vpn_node
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.yiie.entity.VPNNode">
+        update vpn_node
+        <set>
+            <if test="node != null">
+                node = #{node,jdbcType=VARCHAR},
+            </if>
+            <if test="ip != null">
+                ip = #{ip,jdbcType=VARCHAR},
+            </if>
+            <if test="protocol != null">
+                protocol = #{protocol,jdbcType=VARCHAR},
+            </if>
+            <if test="link != null">
+                link = #{link,jdbcType=VARCHAR},
+            </if>
+            <if test="maxUp != null">
+                max_up = #{maxUp,jdbcType=INTEGER},
+            </if>
+            <if test="maxDown != null">
+                max_down = #{maxDown,jdbcType=INTEGER},
+            </if>
+            <if test="port != null">
+                port = #{port,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                `status` = #{status,jdbcType=TINYINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+</mapper>

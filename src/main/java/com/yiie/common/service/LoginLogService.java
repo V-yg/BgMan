@@ -1,5 +1,6 @@
 package com.yiie.common.service;
 
+import com.yiie.entity.ChartBean;
 import com.yiie.entity.LoginLog;
 import com.yiie.vo.request.LogPageReqVO;
 import com.yiie.vo.request.LoginLogPageReqVO;
@@ -19,4 +20,6 @@ public interface LoginLogService {
     PageVO<LoginLog> pageInfo(LoginLogPageReqVO vo);
 
     void deleted(List<String> logIds);
+
+    ChartBean getCharData();
 }

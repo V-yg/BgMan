@@ -91,4 +91,24 @@ public class IndexController {
         return "main";
     }
 
+    @GetMapping("/vpnusers")
+    public String vpnUsers(){
+        return "vpn/vpnuser_list";
+    }
+
+    @GetMapping("/vpnnodes")
+    public String vpnNodes(){
+        return "vpn/vpnnode_list";
+    }
+
+    @GetMapping("/vpnuserflow")
+    public String vpnUserFlow(){
+        return "vpn/vpnuserflow_list";
+    }
+
+    @GetMapping("/server")
+    public String server(){
+        return "logs/server";
+    }
+
 }

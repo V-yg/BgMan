@@ -6,10 +6,7 @@ import com.yiie.common.mapper.LoginLogMapper;
 import com.yiie.common.mapper.UserMapper;
 import com.yiie.common.service.*;
 import com.yiie.constant.Constant;
-import com.yiie.entity.Dept;
-import com.yiie.entity.LoginLog;
-import com.yiie.entity.Role;
-import com.yiie.entity.User;
+import com.yiie.entity.*;
 import com.yiie.enums.BaseResponseCode;
 import com.yiie.exceptions.BusinessException;
 import com.yiie.utils.*;
@@ -390,4 +387,5 @@ public class UserServiceImpl implements UserService {
     private Set<String> getPermissionsByUserId(String userId){
         return  permissionService.getPermissionsByUserId(userId);
     }
+
 }

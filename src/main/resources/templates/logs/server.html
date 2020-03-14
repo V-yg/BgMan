@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="/css/bootstrap1.css" rel="stylesheet"/>
+    <link href="/css/style1.css" rel="stylesheet"/>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="col-sm-12">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>CPU</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link"><i class="fa fa-times"></i></a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <table class="table table-hover no-margins">
+                            <thead>
+                            <tr>
+                                <th>属性</th>
+                                <th>值</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>核心数</td>
+                                <td id="num">0个</td>
+                            </tr>
+                            <tr>
+                                <td>用户使用率</td>
+                                <td id="userrate">0%</td>
+                            </tr>
+                            <tr>
+                                <td>系统使用率</td>
+                                <td id="sysrate">0%</td>
+                            </tr>
+                            <tr>
+                                <td>当前空闲率</td>
+                                <td id="freerate">0%</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>内存</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            <a class="close-link"><i class="fa fa-times"></i></a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <table class="table table-hover no-margins">
+                            <thead>
+                            <tr>
+                                <th>属性</th>
+                                <th>内存</th>
+                                <th>swap</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>总内存</td>
+                                <td id="memtotal">0GB</td>
+                                <td id="swaptotal">0MB</td>
+                            </tr>
+                            <tr>
+                                <td>已用内存</td>
+                                <td id="memuse">0GB</td>
+                                <td id="swapuse">0MB</td>
+                            </tr>
+                            <tr>
+                                <td>剩余内存</td>
+                                <td id="memfree">0GB</td>
+                                <td id="swapfree">0MB</td>
+                            </tr>
+                            <tr>
+                                <td>使用率</td>
+                                <td id="memrate">%</td>
+                                <td id="swaprate">%</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>服务器信息</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table table-hover margin bottom">
+                                    <tbody>
+                                    <tr>
+                                        <td>服务器名称</td>
+                                        <td >Yiie</td>
+                                        <td>操作系统</td>
+                                        <td >Linux</td>
+                                    </tr>
+                                    <tr>
+                                        <td>服务器域名</td>
+                                        <td >yiiang.com</td>
+                                        <td>系统架构</td>
+                                        <td >centos 7.4</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Java虚拟机信息</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table table-hover margin bottom">
+                                    <tbody>
+                                    <tr>
+                                        <td>Java名称</td>
+                                        <td >Java</td>
+                                        <td>Java版本</td>
+                                        <td >1.8.12</td>
+                                    </tr>
+                                    <tr>
+                                        <td>启动时间</td>
+                                        <td >2018-12-31 00:00:00</td>
+                                        <td>运行时长</td>
+                                        <td >0天0时0分0秒</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="1">安装路径</td>
+                                        <td colspan="3">/opt/app</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/layui/layui.all.js"></script>
+<script src="/js/util.js"></script>
+<script>
+    var $ = jQuery = layui.jquery;
+    CoreUtil.sendAjax("/sys/serverinfo", null, function (res) {
+        $('#num').html(res.data.cpuNum+"个");
+        $('#userrate').html(res.data.used+"%");
+        $('#sysrate').html(res.data.sys+"%");
+        $('#freerate').html(res.data.free+"%");
+        $('#memtotal').html(res.data.memTotal);
+        $('#swaptotal').html(res.data.swapTotal);
+        $('#memuse').html(res.data.memUsed);
+        $('#swapuse').html(res.data.swapUsed);
+        $('#memfree').html(res.data.memFree);
+        $('#swapfree').html(res.data.swapFree);
+        $('#memrate').html(res.data.memUsedRate);
+        $('#swaprate').html(res.data.swapUsedRate);
+    }, "POST", false, function (res) {
+        alert("数据请求失败！")
+    });
+</script>

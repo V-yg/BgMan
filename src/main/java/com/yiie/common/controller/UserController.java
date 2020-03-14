@@ -184,6 +184,7 @@ public class UserController {
         userService.deletedUsers(userIds,operationId);
         return DataResult.success();
     }
+
     @GetMapping("/user/roles/{userId}")
     @ApiOperation(value = "赋予角色-获取所有角色接口")
     @LogAnnotation(title = "用户管理",action = "赋予角色-获取所有角色接口")

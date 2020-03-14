@@ -13,6 +13,11 @@ import lombok.Data;
  */
 @Data
 public class UserPageReqVO {
+    public UserPageReqVO(int pageNum, int pageSize, String username) {
+        this.pageNum = pageNum;
+        this.pageSize = pageSize;
+        this.username = username;
+    }
 
     @ApiModelProperty(value = "第几页")
     private int pageNum=1;
