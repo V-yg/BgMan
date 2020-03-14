@@ -7,9 +7,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://www.yiiang.com:3306/bgman?useUnicode=true&characterEncoding=utf-8&useSSL=false
-      username: root
-      password: WYG666sdx
+      url: 
+      username: 
+      password: 
       initial-size: 5
       max-active: 20
       min-idle: 5
