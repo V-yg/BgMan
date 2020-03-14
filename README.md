@@ -28,9 +28,9 @@ Spring Boot 2.x+Layui+Mybatis+MySQL+Shiro+Redis+JWT+Swagger2+thymeleaf+druid
 
 前端模板		 ![https://img.shields.io/badge/Layui-2.1.0-5ba5e1 ](https://img.shields.io/badge/Layui-2.1.0-5ba5e1)
 
-#### 体验地址：
+#### 体验地址： http://14.116.203.21:8082/
 
-**体验账号 **
+**体验账号**
 
 | 账号  | 密码  | 权限                                     |
 | ----- | ----- | ---------------------------------------- |
@@ -58,6 +58,18 @@ Spring Boot 2.x+Layui+Mybatis+MySQL+Shiro+Redis+JWT+Swagger2+thymeleaf+druid
 ```
 
 #### 系统截图：
+![https://github.com/V-yg/BgMan/blob/master/images/1.png ](https://github.com/V-yg/BgMan/blob/master/images/1.png)
+![https://github.com/V-yg/BgMan/blob/master/images/2.png ](https://github.com/V-yg/BgMan/blob/master/images/2.png)
+![https://github.com/V-yg/BgMan/blob/master/images/3.png ](https://github.com/V-yg/BgMan/blob/master/images/3.png)
+![https://github.com/V-yg/BgMan/blob/master/images/4.png ](https://github.com/V-yg/BgMan/blob/master/images/4.png)
+![https://github.com/V-yg/BgMan/blob/master/images/5.png ](https://github.com/V-yg/BgMan/blob/master/images/5.png)
+![https://github.com/V-yg/BgMan/blob/master/images/6.png ](https://github.com/V-yg/BgMan/blob/master/images/6.png)
+![https://github.com/V-yg/BgMan/blob/master/images/7.png ](https://github.com/V-yg/BgMan/blob/master/images/7.png)
+![https://github.com/V-yg/BgMan/blob/master/images/8.png ](https://github.com/V-yg/BgMan/blob/master/images/8.png)
+![https://github.com/V-yg/BgMan/blob/master/images/9.png ](https://github.com/V-yg/BgMan/blob/master/images/9.png)
+![https://github.com/V-yg/BgMan/blob/master/images/10.png ](https://github.com/V-yg/BgMan/blob/master/images/10.png)
+![https://github.com/V-yg/BgMan/blob/master/images/11.png ](https://github.com/V-yg/BgMan/blob/master/images/11.png)
+![https://github.com/V-yg/BgMan/blob/master/images/12.png ](https://github.com/V-yg/BgMan/blob/master/images/12.png) ![https://github.com/V-yg/BgMan/blob/master/images/13.png ](https://github.com/V-yg/BgMan/blob/master/images/13.png)
 
 
 
