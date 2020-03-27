@@ -2,7 +2,7 @@
 
 ​	后台权限管理系统(Background Management)，觉得BgMan好听，就叫BgMan了。BgMan是一款简单高效的后台加权限管理系统，使用Spring Boot 2.x，Shiro和Layui构建 ,权限控制的方式为 RBAC，代码通熟易，JWT（无状态token）过期自动刷新，数据全程 ajax 获取，封装 ajax 工具类、菜单无线层级展示，加入树形组件、图标选择器。数据交互都是以 JSON 格式交互。后台接口RESTful 风格无论作为企业级后台管理系统还是私活框架亦或者拿来当做后台系统练手，都是一个绝佳的项目，并且会不断进行迭代更新，欢迎一起来维护此项目，邮箱 yiie315@163.com
 
-#### 当前版本：![https://img.shields.io/badge/V1.0.0-green](https://img.shields.io/badge/V1.0.0-green)
+#### 当前版本：![https://img.shields.io/badge/V1.1.0-green](https://img.shields.io/badge/V1.1.0-green)
 
 #### 系统架构：
 
