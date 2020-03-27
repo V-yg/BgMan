@@ -49,6 +49,12 @@ Spring Boot 2.x+Layui+Mybatis+MySQL+Shiro+Redis+JWT+Swagger2+thymeleaf+druid
 │  ├─操作日志
 │  ├─登录日志
 │  ├─SQL监控
+│  ├─服务器性能监控
+├─VPN管理
+│  ├─VPN用户管理
+│  ├─VPN数据
+│  ├─流量管理
+│  ├─节点管理
 └─其他模块
    │  ├─表单组件
    │  ├─表单组合
