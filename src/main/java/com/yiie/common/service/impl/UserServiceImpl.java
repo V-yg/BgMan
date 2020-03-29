@@ -38,6 +38,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+    private int LOGIN_FAIL_CNT = 10;
+    private int LOGIN_FAIL_TIME = 60;
+
     @Autowired
     private UserMapper userMapper;
 
@@ -69,9 +72,51 @@ public class UserServiceImpl implements UserService {
     public LoginRespVO login(LoginReqVO vo) {
         HttpServletRequest request = HttpContextUtils.getHttpServletRequest();
         LoginLog loginLog = new LoginLog();
+        String ip = IPUtil.getIpAddr(request);
+        // 判断该用户是否被锁
+        Map<String, Object> retMap = new HashMap<String, Object>();
+        boolean isLock = redisService.isLoginLock(ip);
+        System.out.println("======================================用户被锁：" + isLock);
+        if(isLock) {
+            loginLog.setStatus(0);
+            loginLog.setMsg("IP被锁定");
+            loginLog.setCode(BaseResponseCode.IP_LOGIN_FAILCOUNT_BIG.getCode());
+            saveloginLog(loginLog);
+            throw new BusinessException(BaseResponseCode.IP_LOGIN_FAILCOUNT_BIG);
+        }
+        if(ip != null){
+            // 某时间间隔内ip错误次数
+            Long retriesLockNum = redisService.getLoginRetriesLockNum(ip);
+            System.out.println("==================================" + ip + " 失败次数 " + retriesLockNum);
+//            if(retriesLockNum != null && retriesLockNum < LOGIN_FAIL_CNT && retriesLockNum > 0) {
+//                System.out.println("==================================" + ip + " 可以正常登录 ，删除了redis记录");
+//                //登录成功后删除redis记录
+//                redisService.delete(ip);
+//            } else
+                if(retriesLockNum >= LOGIN_FAIL_CNT) {// 处理并发
+                isLock = redisService.isLoginLock(ip);
+                if (!isLock) {
+                    redisService.loginLock(ip, 60 * LOGIN_FAIL_TIME);
+                }
+                loginLog.setStatus(0);
+                loginLog.setMsg("IP被锁定");
+                loginLog.setCode(BaseResponseCode.IP_LOGIN_FAILCOUNT_BIG.getCode());
+                saveloginLog(loginLog);
+                throw new BusinessException(BaseResponseCode.IP_LOGIN_FAILCOUNT_BIG);
+            }
+        }
+        Long retriesLockNum = redisService.setloginRetriesLockNum(ip, 60);
+        if(retriesLockNum != null && retriesLockNum >= LOGIN_FAIL_CNT) {
+            isLock = redisService.loginLock(ip, 60*LOGIN_FAIL_TIME);
+            loginLog.setStatus(0);
+            loginLog.setMsg("IP被锁定");
+            loginLog.setCode(BaseResponseCode.IP_LOGIN_FAILCOUNT_BIG.getCode());
+            saveloginLog(loginLog);
+            throw new BusinessException(BaseResponseCode.IP_LOGIN_FAILCOUNT_BIG);
+        }
         loginLog.setUsername(vo.getUsername());
         loginLog.setLoginTime(new Date());
-        loginLog.setIp(IPUtil.getIpAddr(request));
+        loginLog.setIp(ip);
         loginLog.setLocation(AddressUtil.getCityInfo(IPUtil.getIpAddr(request)));
         loginLog.setSystemBrowserInfo();
         loginLog.setStatus(1);
@@ -93,6 +138,7 @@ public class UserServiceImpl implements UserService {
         if(!PasswordUtil.matches(user.getSalt(),vo.getPassword(),user.getPassword())){
             loginLog.setStatus(0);
             loginLog.setMsg("密码错误");
+            redisService.incrby(ip,0L);
             loginLog.setCode(BaseResponseCode.PASSWORD_ERROR.getCode());
             saveloginLog(loginLog);
             throw new BusinessException(BaseResponseCode.PASSWORD_ERROR);
@@ -115,6 +161,7 @@ public class UserServiceImpl implements UserService {
         loginLog.setCode(0);
         loginLog.setMsg("登录成功");
         loginLog.setStatus(1);
+        redisService.delete(ip);
         saveloginLog(loginLog);
         return respVO;
     }

@@ -2,11 +2,18 @@ package com.yiie.common.service;
 
 import com.yiie.enums.BaseResponseCode;
 import com.yiie.exceptions.BusinessException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -159,5 +166,72 @@ public class RedisService {
             throw new BusinessException(BaseResponseCode.DATA_ERROR.getCode(),"key、value、unit都不能为空");
         }
         return redisTemplate.opsForValue().setIfAbsent(key,value,time,unit);
+    }
+
+    /**
+     * 登录次数验证
+     * @param key
+     * @param retriesLifecycleTime 多长时间内重试有效(秒)
+     */
+    public Long setloginRetriesLockNum(String key, int retriesLifecycleTime) {
+        String retriesLockscript = "local errorNum = redis.call('get',KEYS[1]) "
+                + "if errorNum == false "
+                + "then errorNum = redis.call('incr',KEYS[1]) redis.call('expire',KEYS[1],tonumber(ARGV[1])) return errorNum "
+                + "else return redis.call('incr',KEYS[1]) end";
+        Long retriesLockNum = executeScript(retriesLockscript, 1, key, String.valueOf(retriesLifecycleTime));
+        return retriesLockNum;
+    }
+
+    /**
+     * 是否锁定
+     * @param key
+     * @return 锁定 true，否则false
+     */
+    public boolean isLoginLock(String key) {
+        String lockKey = key+"_lock";
+        String lockScript = "return redis.call('get',KEYS[1]) ";
+        String lockVlaue = executeScript(lockScript, 1, lockKey);
+        return StringUtils.isBlank(lockVlaue) ? false : true;
+    }
+
+    /**
+     * 登录次数多，锁定
+     * @param key
+     * @param lockTime 锁定时间(秒)
+     * @return 锁定true，否则false
+     */
+    public boolean loginLock(String key,int lockTime) {
+        String lockKey = key+"_lock";
+        String lockScript = "if redis.call('setnx',KEYS[1],ARGV[1]) == 1 "
+                + "then redis.call('expire',KEYS[1],tonumber(ARGV[2])) return 1 "
+                + "else return 2 end";
+        String nowTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:dd:ss");
+        Long isLocked = executeScript(lockScript, 1, lockKey, nowTime, String.valueOf(lockTime));
+        return isLocked != null && isLocked==1 ? true : false;
+    }
+
+
+    /**
+     * 得到失败次数
+     * @param key
+     * @return
+     */
+    public Long getLoginRetriesLockNum(String key) {
+        String retriesLockscript = "return redis.call('get',KEYS[1]) ";
+        String errorNum = executeScript(retriesLockscript, 1, key);
+        return StringUtils.isBlank(errorNum) ? 0L : Long.parseLong(errorNum);
+    }
+
+    private <T> T executeScript(final String script, final int keyCount, final String... values) {
+        T value = redisTemplate.execute(new RedisCallback<T>(){
+            @SuppressWarnings("unchecked")
+            @Override
+            public T doInRedis(RedisConnection connection)
+                    throws DataAccessException {
+                Jedis jedis = (Jedis) connection.getNativeConnection();
+                return (T) jedis.eval(script, keyCount, values);
+            }
+        });
+        return value;
     }
 }

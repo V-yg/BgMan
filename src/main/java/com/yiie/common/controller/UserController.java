@@ -7,6 +7,7 @@ import com.yiie.entity.LoginLog;
 import com.yiie.entity.User;
 import com.yiie.enums.BaseResponseCode;
 import com.yiie.utils.DataResult;
+import com.yiie.utils.IPUtil;
 import com.yiie.utils.JwtTokenUtil;
 import com.yiie.vo.request.*;
 import com.yiie.vo.response.HomeRespVO;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Time：2020-1-1 11:22
@@ -42,9 +44,11 @@ public class UserController {
     private UserService userService;
 
 
+
     @PostMapping("/user/login")
     @ApiOperation(value = "用户登录接口")
     public DataResult<LoginRespVO> login(@RequestBody(required=false) String data){
+
         String[] splited = data.split("&");
         String type = splited[0].split("=")[1];
         String username = splited[1].split("=")[1];
@@ -55,7 +59,6 @@ public class UserController {
         vo.setPassword(password);
         DataResult<LoginRespVO> result=DataResult.success();
         result.setData(userService.login(vo));
-        System.out.println(result.toString());
         return result;
     }
 

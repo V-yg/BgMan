@@ -38,6 +38,7 @@ public enum BaseResponseCode implements ResponseCodeInterface {
     OPERATION_MYSELF(401018,"不能操作自己"),
     OPERATION_ADMIN(401018,"不能操作管理员"),
     DELETE_CONTAINS_MYSELF(401019,"删除的用户中包含自己，请重新选择"),
+    IP_LOGIN_FAILCOUNT_BIG(401020,"登录失败次数过多，该IP被锁定！"),
     ;
 
     /**
