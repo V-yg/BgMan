@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/stylee.css">
+    <script src="https://cdn.bootcss.com/echarts/4.6.0/echarts.min.js"></script>
+    <script src="/layui/layui.all.js"></script>
+    <script src="/js/util.js"></script>
+</head>
+<body>
+<div class="container-scroller">
+    <div class="container-fluid page-body-wrapper">
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="row">
+                    <div class="col-md-9 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">故宫重要景点实时人数 Visitor</h4>
+                                <div id="echars1" style="width: 100%;height: 500px;margin-top: 10px;margin-left: 10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">景区人数饱和度</h4>
+                                <canvas id="c" style="margin-top: 50px;margin-right: 30px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    var $ = jQuery = layui.jquery;
+    var myChart = echarts.init(document.getElementById('echars1'));
+    option = {
+        xAxis: {
+            type: 'category',
+            data: ["神武门","东华门","西华门","太和门","太和殿","中和殿","中山公园","城楼","万春亭","文化宫","角楼","午门","景山公园","有琼华岛","白塔"]
+        },
+        yAxis: {
+            type: 'value'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985'
+                }
+            }
+        },
+        toolbox: {
+            feature: {
+            magicType: {show: true, type: ['bar','scroll']},
+            restore: {show: true},
+            saveAsImage: {show: true}
+            }
+        },
+        series: [{
+            data: [1023,1311,1222,1022,1234,1121,1111,1022,1222,1123,1167,1186,1265,1000,1003],
+            type: 'line',
+            areaStyle: {}
+        }]
+    };
+    myChart.setOption(option);
+    setInterval(function () {
+        option.series[0].data[0] = (Math.random() * 200 + 1000);
+        option.series[0].data[1] = (Math.random() * 200 + 1000);
+        option.series[0].data[2] = (Math.random() * 200 + 1000);
+        option.series[0].data[3] = (Math.random() * 200 + 1000);
+        option.series[0].data[4] = (Math.random() * 200 + 1000);
+        option.series[0].data[5] = (Math.random() * 200 + 1000);
+        option.series[0].data[6] = (Math.random() * 200 + 1000);
+        option.series[0].data[7] = (Math.random() * 200 + 1000);
+        option.series[0].data[8] = (Math.random() * 200 + 1000);
+        option.series[0].data[9] = (Math.random() * 200 + 1000);
+        option.series[0].data[10] = (Math.random() * 200 + 1000);
+        option.series[0].data[11] = (Math.random() * 200 + 1000);
+        option.series[0].data[12] = (Math.random() * 200 + 1000);
+        option.series[0].data[13] = (Math.random() * 200 + 1000);
+        option.series[0].data[14] = (Math.random() * 200 + 1000);
+        myChart.setOption(option, true);
+    },3000);
+
+    let canvas = document.getElementById("c")
+    let ctx = canvas.getContext("2d")
+    let M = Math
+    let Sin = M.sin
+    let Cos = M.cos
+    let Sqrt = M.sqrt
+    let Pow = M.pow
+    let PI = M.PI
+    let Round = M.round
+    let oW = canvas.width = 250
+    let oH = canvas.height = 250
+    let lineWidth = 2 // 线宽
+    let r = (oW / 2) // 大半径
+    let cR = r - 10 * lineWidth
+    ctx.beginPath()
+    ctx.lineWidth = lineWidth
+
+    // 水波动画初始参数
+    let data = 0.39
+    let axisLength = 2 * r - 16 * lineWidth // Sin 图形长度
+    let unit = axisLength / 9 // 波浪宽
+    let range = .4 // 浪幅
+    let nowrange = range
+    let xoffset = 8 * lineWidth // x 轴偏移量
+    let sp = 0 // 周期偏移量
+    let nowdata = 0
+    let waveupsp = 0.006 // 水波上涨速度
+
+    // 圆动画初始参数
+    let arcStack = [] // 圆栈
+    let bR = r - 8 * lineWidth
+    let soffset = -(PI / 2) // 圆动画起始位置
+    let circleLock = true // 起始动画锁
+
+    // 获取圆动画轨迹点集
+    for (var i = soffset; i < soffset + 2 * PI; i += 1 / (8 * PI)) {
+        arcStack.push([
+            r + bR * Cos(i),
+            r + bR * Sin(i)
+        ])
+    }
+    // 圆起始点
+    let cStartPoint = arcStack.shift();
+    ctx.strokeStyle = "#1c86d1";
+    ctx.moveTo(cStartPoint[0], cStartPoint[1]);
+    // 开始渲染
+    render();
+
+    function drawSine() {
+        ctx.beginPath();
+        ctx.save();
+        var Stack = []; // 记录起始点和终点坐标
+        for (var i = xoffset; i <= xoffset + axisLength; i += 20 / axisLength) {
+            var x = sp + (xoffset + i) / unit;
+            var y = Sin(x) * nowrange;
+            var dx = i;
+            var dy = 2 * cR * (1 - nowdata) + (r - cR) - (unit * y);
+            ctx.lineTo(dx, dy);
+            Stack.push([dx, dy])
+        }
+        // 获取初始点和结束点
+        var startP = Stack[0]
+        var endP = Stack[Stack.length - 1]
+        ctx.lineTo(xoffset + axisLength, oW);
+        ctx.lineTo(xoffset, oW);
+        ctx.lineTo(startP[0], startP[1])
+        ctx.fillStyle = "#99fbeb";
+        ctx.fill();
+        ctx.restore();
+    }
+
+    function drawText() {
+        ctx.globalCompositeOperation = 'source-over';
+        var size = 0.4 * cR;
+        ctx.font = 'bold ' + size + 'px Microsoft Yahei';
+        let txt = (nowdata.toFixed(2) * 100).toFixed(0) + '`%';
+        var fonty = r + size / 2;
+        var fontx = r - size * 0.8;
+        ctx.fillStyle = "#1eebf6";
+        ctx.textAlign = 'center';
+        ctx.fillText(txt, r + 5, r + 20)
+    }
+    //最外面淡黄色圈
+    function drawCircle() {
+        ctx.beginPath();
+        ctx.lineWidth = 15;
+        ctx.strokeStyle = '#9dfff4';
+        ctx.arc(r, r, cR + 7, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.restore();
+    }
+    //灰色圆圈
+    function grayCircle() {
+        ctx.beginPath();
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = '#eaeaea';
+        ctx.arc(r, r, cR - 5, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.restore();
+        ctx.beginPath();
+    }
+    //橘黄色进度圈
+    function orangeCircle() {
+        ctx.beginPath();
+        ctx.strokeStyle = '#32fbea';
+        //使用这个使圆环两端是圆弧形状
+        ctx.lineCap = 'round';
+        ctx.arc(r, r, cR - 5, 0 * (Math.PI / 180.0) - (Math.PI / 2), (nowdata * 360) * (Math.PI / 180.0) - (Math.PI / 2));
+        ctx.stroke();
+        ctx.save()
+    }
+    //裁剪中间水圈
+    function clipCircle() {
+        ctx.beginPath();
+        ctx.arc(r, r, cR - 10, 0, 2 * Math.PI, false);
+        ctx.clip();
+    }
+    //渲染canvas
+    function render() {
+        ctx.clearRect(0, 0, oW, oH);
+        //最外面淡黄色圈
+        drawCircle();
+        //灰色圆圈
+        grayCircle();
+        //橘黄色进度圈
+        orangeCircle();
+        //裁剪中间水圈
+        clipCircle();
+        // 控制波幅
+        if (data >= 0.85) {
+            if (nowrange > range / 4) {
+                var t = range * 0.01;
+                nowrange -= t;
+            }
+        } else if (data <= 0.1) {
+            if (nowrange < range * 1.5) {
+                var t = range * 0.01;
+                nowrange += t;
+            }
+        } else {
+            if (nowrange <= range) {
+                var t = range * 0.01;
+                nowrange += t;
+            }
+            if (nowrange >= range) {
+                var t = range * 0.01;
+                nowrange -= t;
+            }
+        }
+        if ((data - nowdata) > 0) {
+            nowdata += waveupsp;
+        }
+        if ((data - nowdata) < 0) {
+            nowdata -= waveupsp
+        }
+        sp += 0.07;
+        // 开始水波动画
+        drawSine();
+        // 写字
+        drawText();
+        requestAnimationFrame(render)
+
+
+
+    }
+</script>

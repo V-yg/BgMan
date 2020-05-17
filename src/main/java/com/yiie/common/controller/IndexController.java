@@ -111,4 +111,13 @@ public class IndexController {
         return "logs/server";
     }
 
+    @GetMapping("/realshow")
+    public String realShow(){
+        return "show/real";
+    }
+
+    @GetMapping("/hotshow")
+    public String hotShow(){
+        return "show/hot";
+    }
 }

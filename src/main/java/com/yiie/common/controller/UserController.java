@@ -43,8 +43,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
-
     @PostMapping("/user/login")
     @ApiOperation(value = "用户登录接口")
     public DataResult<LoginRespVO> login(@RequestBody(required=false) String data){
