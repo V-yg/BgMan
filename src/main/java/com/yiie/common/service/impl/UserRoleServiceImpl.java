@@ -73,4 +73,8 @@ public class UserRoleServiceImpl implements UserRoleService {
     public int removeByUserId(String userId) {
         return userRoleMapper.removeByUserId(userId);
     }
+    
+    public int removeByUserId1(String userId) {
+        return userRoleMapper.removeByUserId(userId);
+    }
 }
