@@ -28,7 +28,7 @@
         <theborakompanioni.version>2.0.0</theborakompanioni.version>
         <ip2region.version>1.7.2</ip2region.version>
         <excelKit.version>2.0.72</excelKit.version>
-        <commonsIo.version>2.6</commonsIo.version>
+        <commonsIo.version>2.7</commonsIo.version>
         <oshi.version>3.9.1</oshi.version>
         <redis.version>2.10.2</redis.version>
         <lang3.version>3.4</lang3.version>
